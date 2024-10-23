@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="jquery-3.7.1.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -18,6 +19,84 @@
     </div>
     <script>
         // 此处插入你的代码
+        $(document).ready(function() {
+            alert("是的，这是一份礼物，请点击战队图标为我的战队投票（")
+
+            //定义所有战队投票初始值为0
+            let votes = {
+                EDG: 0,
+                FPX: 0,
+                TE: 0,
+                BLG: 0
+            };
+
+            //更改为属性相对position
+            $('img').css('position', 'relative');
+
+            //设定点击事件，点击图片战队投票数加1
+            $("img").click(function () {
+                //因为图片有class属性值为队名，可以与votes的键对应，this指定为点击的图片
+                let teamname = $(this).attr('class');
+                //votes中与点击图片class属性同名的键的值增加
+                if (votes.hasOwnProperty(teamname)) {
+                    votes[teamname]++;
+                }
+                alert("你已为该战队投出一票:" + teamname);
+            })
+
+
+
+            $("input[type='button']").click(function () {
+                $("#bottom div").empty()//清空内容
+
+                //琐碎的方法
+                // $(".EDG").css({ 'position': 'relative', 'left': votes.EDG * 100 + "px" });
+                // $(".FPX").css({ 'position': 'relative', 'left': votes.FPX * 100 +  + "px" });
+                // $(".TE").css({ 'position': 'relative', 'left': votes.TE * 100  + "px" });
+                // $(".BLG").css({ 'position': 'relative', 'left': votes.BLG * 100  + "px" });
+
+                //（只有edg能动）
+                // $("img").each(function (){
+                //     let $img = $(this);
+                //     let classname = $("img").attr('class');这句有问题，只获取第一张图片的class
+                //     let distance = votes[classname];
+                //     $img.css({ 'position': 'relative', 'left': distance * 100  + "px" });
+
+                //遍历每一张图片
+                $("img").each(function () {
+                    let classname =$(this).attr('class'); // 获取图片战队名
+                    $(this).css('left', votes[classname] * 100 + 'px');//移动图片
+                })
+
+                let winner = [];//定义一个空数组，应对有多个战队票数相同的情况
+                let values = Object.values(votes);//取得votes中的所有值
+                let maxvotes = Math.max(...values);//...扩展运算符，将values数组展开
+                //遍历votes数组的所有键
+                for (let team in votes){
+                    if (votes[team]===maxvotes) {
+                        winner.push(team)//将获胜队名加入到数组中
+                    }
+                }
+                let winnerstring = winner.join(', ');//将数组所有元素转变为字符串
+
+                //添加一个容器方便实现渐入效果
+                let newdiv = $('<div style="display: none;"></div>');
+
+                //讨论票数都为零的情况
+                if (Object.values(votes).every(el => el === 0)) {
+
+                    newdiv.html(`<div style="color: red; font-size: 60px;">你还未投票呢 !</div>`);
+                } else {
+
+                    newdiv.html(`<div style="color: red; font-size: 60px;">最受欢迎的队伍是：${winnerstring} !</div>`);
+                }
+                $("#bottom").append(newdiv);
+
+                // 对新的容器应用淡入效果
+                newdiv.fadeIn(1000);
+            });
+
+        })
     </script>
 </body>
 </html>
